@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>// edw4rr.  — Reflection Terminal</title>
+  <style>
+    /* ====== BASE ====== */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: radial-gradient(circle at center, #000 60%, #011 100%);
+      font-family: 'Courier New', monospace;
+      color: #00ff99;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ====== AMBIENT GLOW ====== */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(0,255,120,0.06), transparent 80%);
+      animation: flicker 0.2s infinite;
+      z-index: 0;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.97; }
+    }
+
+    /* ====== SCANLINES ====== */
+    .scanline {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        180deg,
+        rgba(0, 255, 100, 0.03),
+        rgba(0, 255, 100, 0.03) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      animation: scanmove 3s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes scanmove {
+      from { background-position: 0 0; }
+      to { background-position: 0 100px; }
+    }
+
+    /* ====== TERMINAL TEXT ====== */
+    .terminal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #00ff99;
+      font-size: 13px;
+      letter-spacing: 1px;
+      white-space: pre-wrap;
+      text-align: center;
+      z-index: 2;
+      line-height: 2em;
+      animation: fadeIn 2s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -48%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    /* ====== CHARACTER TYPING ====== */
+    .char {
+      opacity: 0;
+      display: inline-block;
+      animation: fadeInChar 0.06s forwards;
+    }
+    @keyframes fadeInChar { to { opacity: 1; } }
+
+    /* ====== CURSOR ====== */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      background-color: #00ff99;
+      animation: blink 1s steps(2, start) infinite;
+      margin-left: 4px;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ====== SIGNATURE (WIPE ANIMATION) ====== */
+    .username {
+      position: absolute;
+      bottom: 25px;
+      right: 40px;
+      font-size: 17px;
+      color: #00ffaa;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-shadow: 0 0 8px rgba(0,255,180,0.4);
+      animation: wipe 8s ease-in-out infinite alternate;
+    }
+    @keyframes wipe {
+      0%   { clip-path: inset(0 100% 0 0); opacity: 0.3; }
+      50%  { clip-path: inset(0 0 0 0); opacity: 1; }
+      100% { clip-path: inset(0 0 0 100%); opacity: 0.3; }
+    }
+
+    /* ====== BACKGROUND GRID ====== */
+    .grid {
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(0,255,100,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0,255,100,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.2;
+      z-index: 0;
+      animation: gridPulse 6s ease-in-out infinite alternate;
+    }
+    @keyframes gridPulse {
+      from { opacity: 0.15; }
+      to { opacity: 0.25; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+  <div class="grid"></div>
+
+  <!-- Terminal Quote -->
+  <div class="terminal" id="terminal"></div>
+
+  <!-- Signature -->
+  <div class="username">edw4rr. </div>
+
+  <script>
+    const text = `“Cie mantau terus wkwk! .”`;
+    const target = document.getElementById("terminal");
+    let delay = 0;
+
+    for (let char of text) {
+      if (char === '\\n') {
+        target.appendChild(document.createElement("br"));
+        continue;
+      }
+      const span = document.createElement("span");
+      span.textContent = char;
+      span.className = "char";
+      span.style.animationDelay = delay + "s";
+      target.appendChild(span);
+      delay += 0.08;
+    }
+
+    // Blinking cursor
+    const cursor = document.createElement("span");
+    cursor.className = "cursor";
+    target.appendChild(cursor);
+  </script>
+</body>
+</html>
